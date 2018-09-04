@@ -1,0 +1,29 @@
+---
+- name: Download docker install script
+  get_url:
+    url: https://get.docker.com
+    dest: /tmp/docker-install.sh
+    mode: "a+x"
+
+- name: Run install script
+  shell: /bin/sh /tmp/docker-install.sh
+
+- name: Remove temporary file
+  file:
+    path: /tmp/docker-install.sh
+    state: absent
+    
+- name: Set Docker to auto-start
+  service: name=docker enabled=true state=started
+
+- name: Add docker_pi_group_users to the docker group
+  become: yes
+  user:
+    name: "{{ item }}"
+    groups: docker
+  with_items:
+    - pi
+
+- name: Login to docker hub
+  command: docker login --username="{{ docker_pi_hub_username }}" --password="{{ docker_pi_hub_password }}"
+  become_user: "{{ docker_pi_user }}"

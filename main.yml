@@ -1,0 +1,6 @@
+---
+- hosts: foxey-lady
+  remote_user: pi
+  roles:
+    - role: docker
+
