@@ -1,17 +1,34 @@
 ---
+- name: Install python-apt
+  become: yes
+  package:
+    name=python-apt
+    state=present
+
+- name: Check if Docker is already installed
+  become: yes
+  package:
+    name: docker-ce
+    state: present
+  check_mode: true
+  register: docker_check
+
 - name: Download docker install script
   get_url:
     url: https://get.docker.com
     dest: /tmp/docker-install.sh
     mode: "a+x"
+  when: docker_check.changed
 
 - name: Run install script
   shell: /bin/sh /tmp/docker-install.sh
+  when: docker_check.changed
 
 - name: Remove temporary file
   file:
     path: /tmp/docker-install.sh
     state: absent
+  when: docker_check.changed
     
 - name: Set Docker to auto-start
   service: name=docker enabled=true state=started
