@@ -43,20 +43,20 @@
   become_user: "{{ docker_pi_user }}"
   when: docker_pi_hub_username != "" and docker_pi_hub_password != ""
 
-- name: Docker swarm master leave
-  become: yes
-  command: docker swarm leave -f
+- name: Force leave docker swarm
+  shell: docker swarm leave -f
   ignore_errors: True
 
-- name: Docker swarm master
-  become: yes
-  command: docker swarm init
+- name: Init docker swarm
+  shell: docker swarm init
   when: docker_pi_swarm_role == "manager"
-  register: docker_pi_swarm_join_command
 
-- name: Docker swarm worker
-  become: yes
-  #command: "{{ docker_pi_swarm_join_command.stdout | regex_search('(docker swarm join.*2377)') }}"
-  command: "{{ docker_pi_swarm_join_command}}"
+- name: Get docker swarm worker token
+  shell: docker swarm join-token -q worker
+  register: worker_token
+  when: docker_pi_swarm_role == "manager"
+
+- name: Join docker swarm
+  shell: "docker swarm join --token {{ hostvars['manager']['worker_token']['stdout'] }} {{ hostvars['manager']['ansible_eth0']['ipv4']['address'] }}:2377"
   when: docker_pi_swarm_role == "worker"
 
