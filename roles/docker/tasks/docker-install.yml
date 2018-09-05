@@ -6,11 +6,8 @@
     state=present
 
 - name: Check if Docker is already installed
-  become: yes
-  package:
-    name: docker-ce
-    state: present
-  check_mode: true
+  shell: dpkg-query -W docker-ce
+  ignore_errors: True
   register: docker_check
 
 - name: Download docker install script
@@ -18,17 +15,17 @@
     url: https://get.docker.com
     dest: /tmp/docker-install.sh
     mode: "a+x"
-  when: docker_check.changed
+  when: docker_check is failed
 
 - name: Run install script
   shell: /bin/sh /tmp/docker-install.sh
-  when: docker_check.changed
+  when: docker_check is failed
 
 - name: Remove temporary file
   file:
     path: /tmp/docker-install.sh
     state: absent
-  when: docker_check.changed
+  when: docker_check is failed
     
 - name: Set Docker to auto-start
   service: name=docker enabled=true state=started
@@ -44,3 +41,22 @@
 - name: Login to docker hub
   command: docker login --username="{{ docker_pi_hub_username }}" --password="{{ docker_pi_hub_password }}"
   become_user: "{{ docker_pi_user }}"
+  when: docker_pi_hub_username != "" and docker_pi_hub_password != ""
+
+- name: Docker swarm master leave
+  become: yes
+  command: docker swarm leave -f
+  ignore_errors: True
+
+- name: Docker swarm master
+  become: yes
+  command: docker swarm init
+  when: docker_pi_swarm_role == "manager"
+  register: docker_pi_swarm_join_command
+
+- name: Docker swarm worker
+  become: yes
+  #command: "{{ docker_pi_swarm_join_command.stdout | regex_search('(docker swarm join.*2377)') }}"
+  command: "{{ docker_pi_swarm_join_command}}"
+  when: docker_pi_swarm_role == "worker"
+
