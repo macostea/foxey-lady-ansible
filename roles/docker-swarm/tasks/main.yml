@@ -1,0 +1,19 @@
+---
+# tasks file for docker-swarm
+- name: Check if docker swarm is active
+  shell: "docker info | grep 'Swarm: active'"
+  register: docker_pi_swarm_active
+
+- name: Init docker swarm
+  shell: docker swarm init
+  when: docker_pi_swarm_role == "manager" and docker_pi_swarm_active.rc != 0
+
+- name: Get docker swarm worker token
+  shell: docker swarm join-token -q worker
+  register: worker_token
+  when: docker_pi_swarm_role == "manager" and docker_pi_swarm_active.rc != 0
+
+- name: Join docker swarm
+  shell: "docker swarm join --token {{ docker_pi_worker_token }} {{ docker_pi_manager_addr }}"
+  when: docker_pi_swarm_role == "worker" and docker_pi_swarm_active.rc != 0
+
