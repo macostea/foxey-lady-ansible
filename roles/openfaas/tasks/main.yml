@@ -8,11 +8,17 @@
 
 - name: Check openfaas instalation
   shell: "docker service ls | grep 'func_'"
+  ignore_errors: True
   register: openfaas_installed
 
 - name: Install openfaas
-  shell: "git clone https://github.com/openfaas/faas && cd faas && ./deploy_stack.sh --no-auth"
+  shell: "git clone https://github.com/openfaas/faas && cd faas && ./deploy_stack.armhf.sh --no-auth"
   when: openfaas_installed.rc != 0
+
+- name: Cleanup openfaas install
+  file:
+    path: /home/pi/faas
+    state: absent
 
 - name: Check if openfaas-rabbitmq-connector is installed
   shell: "docker service ls | grep 'connector'"

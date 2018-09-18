@@ -2,5 +2,3 @@
 docker_pi_hub_username: ""
 docker_pi_hub_password: ""
 openfaas_connector_topics: "billing,account"
-openfaas_connector_mq_host: "172.23.0.2"
-openfaas_connector_mq_port: "5672"

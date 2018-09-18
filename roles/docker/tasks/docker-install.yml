@@ -1,9 +1,12 @@
 ---
-- name: Install python-apt
+- name: Install python dependencies
   become: yes
   package:
-    name=python-apt
+    name="{{ item }}"
     state=present
+  with_items:
+    - python-apt
+    - python-pip
 
 - name: Check if Docker is already installed
   shell: dpkg-query -W docker-ce
@@ -43,3 +46,7 @@
   become_user: "{{ docker_pi_user }}"
   when: docker_pi_hub_username != "" and docker_pi_hub_password != ""
 
+- name: Install docker-py
+  pip:
+    name: docker-py
+    state: present

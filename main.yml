@@ -20,11 +20,19 @@
     docker_pi_worker_token: "{{ hostvars['manager']['worker_token']['stdout'] }}"
     docker_pi_manager_addr: "{{ hostvars['manager']['ansible_default_ipv4']['address'] }}:2377"
 
+- name: Install rabbitmq
+  hosts: manager 
+  remote_user: pi
+  roles:
+    - role: rabbitmq
+
 - name: Install openfaas
   hosts: manager
   remote_user: pi
   roles:
     - role: openfaas
   vars:
+    openfaas_connector_mq_host: "{{ hostvars['manager']['ansible_default_ipv4']['address'] }}"
+    openfaas_connector_mq_port: 5672
     openfaas_connector_faas_gw_url: "http://{{ hostvars['manager']['ansible_default_ipv4']['address'] }}:8080"
 

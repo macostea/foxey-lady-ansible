@@ -2,6 +2,7 @@
 # tasks file for docker-swarm
 - name: Check if docker swarm is active
   shell: "docker info | grep 'Swarm: active'"
+  ignore_errors: True
   register: docker_pi_swarm_active
 
 - name: Init docker swarm
