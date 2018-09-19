@@ -48,5 +48,7 @@
 
 - name: Install docker-py
   pip:
-    name: docker-py
+    name: "{{ item }}"
     state: present
+  with_items:
+    - docker-compose

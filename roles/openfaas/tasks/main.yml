@@ -20,12 +20,25 @@
     path: /home/pi/faas
     state: absent
 
-- name: Check if openfaas-rabbitmq-connector is installed
-  shell: "docker service ls | grep 'connector'"
-  ignore_errors: True
-  register: openfaas_rabbit_connector_installed
-
 - name: Install openfaas-rabbitmq-connector
-  shell: "docker service create --name connector -e MQ_TOPICS={{ openfaas_connector_topics }} -e MQ_HOST={{ openfaas_connector_mq_host  }} -e MQ_PORT={{ openfaas_connector_mq_port  }} -e FAAS_GW_URL={{ openfaas_connector_faas_gw_url }} --network func_functions templum/rabbitmq-connector"
-  when: openfaas_rabbit_connector_installed.rc != 0
-
+  docker_service:
+        project_name: openfaas-rabbitmq-connector
+        state: present
+        definition:
+                version: '2'
+                services:
+                        connector:
+                                image: mcostea/rabbitmq-openfaas-connector
+                                environment:
+                                        MQ_TOPICS: "{{ openfaas_connector_topics }}"
+                                        MQ_HOST: "{{ openfaas_connector_mq_host }}"
+                                        MQ_PORT: "{{ openfaas_connector_mq_port }}"
+                                        FAAS_GW_URL: "{{ openfaas_connector_faas_gw_url }}"
+                                networks:
+                                        - func_functions
+                networks:
+                        func_functions:
+                                external: true
+  register: output
+- debug:
+        var: output
