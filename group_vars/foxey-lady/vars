@@ -1,0 +1,4 @@
+---
+docker_pi_hub_username: "{{ vault_docker_pi_hub_username }}"
+docker_pi_hub_password: "{{ vault_docker_pi_hub_password }}"
+openfaas_connector_topics: "billing,account"

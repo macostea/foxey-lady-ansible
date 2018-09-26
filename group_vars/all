@@ -1,4 +1,0 @@
----
-docker_pi_hub_username: ""
-docker_pi_hub_password: ""
-openfaas_connector_topics: "billing,account"
