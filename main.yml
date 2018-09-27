@@ -1,10 +1,4 @@
 ---
-- name: Test some stuff
-  hosts: foxey-lady 
-  tasks:
-    - debug:
-        var: docker_pi_hub_username
-
 - name: Install docker
   hosts: foxey-lady
   remote_user: pi

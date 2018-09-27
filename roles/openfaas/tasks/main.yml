@@ -11,34 +11,25 @@
   ignore_errors: True
   register: openfaas_installed
 
-- name: Install openfaas
+- name: Install openfaas armhf
   shell: "git clone https://github.com/openfaas/faas && cd faas && ./deploy_stack.armhf.sh --no-auth"
-  when: openfaas_installed.rc != 0
+  when: openfaas_installed.rc != 0 and foxey_arch == "armhf"
+
+- name: Install openfaas x86
+  shell: "git clone https://github.com/openfaas/faas && cd faas && ./deploy_stack.sh --no-auth"
+  when: openfaas_installed.rc != 0 and foxey_arch == "x86"
 
 - name: Cleanup openfaas install
   file:
     path: /home/pi/faas
     state: absent
 
+- name: Check if openfaas_connector is installed
+  shell: "docker service ls | grep connector"
+  ignore_errors: True
+  register: openfaas_connector_installed
+
 - name: Install openfaas-rabbitmq-connector
-  docker_service:
-        project_name: openfaas-rabbitmq-connector
-        state: present
-        definition:
-                version: '2'
-                services:
-                        connector:
-                                image: mcostea/rabbitmq-openfaas-connector
-                                environment:
-                                        MQ_TOPICS: "{{ openfaas_connector_topics }}"
-                                        MQ_HOST: "{{ openfaas_connector_mq_host }}"
-                                        MQ_PORT: "{{ openfaas_connector_mq_port }}"
-                                        FAAS_GW_URL: "{{ openfaas_connector_faas_gw_url }}"
-                                networks:
-                                        - func_functions
-                networks:
-                        func_functions:
-                                external: true
-  register: output
-- debug:
-        var: output
+  shell: "docker service create -e MQ_TOPICS={{openfaas_connector_topics}} -e MQ_HOST={{openfaas_connector_mq_host}} -e MQ_PORT={{openfaas_connector_mq_port}} -e FAAS_GW_URL={{openfaas_connector_faas_gw_url}} --network func_functions --name connector mcostea/rabbitmq-openfaas-connector"
+  when: openfaas_connector_installed.rc != 0
+

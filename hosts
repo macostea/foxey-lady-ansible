@@ -1,5 +1,5 @@
 ---
 [foxey-lady]
-manager ansible_host=172.16.254.142 ansible_port=22 ansible_user=pi docker_pi_swarm_role=manager
-worker ansible_host=172.16.254.143 ansible_port=22 ansible_user=pi docker_pi_swarm_role=worker
+manager ansible_host=172.16.254.137 ansible_port=22 ansible_user=pi docker_pi_swarm_role=manager foxey_arch=x86
+worker ansible_host=172.16.254.143 ansible_port=22 ansible_user=pi docker_pi_swarm_role=worker foxey_arch=x86
 
