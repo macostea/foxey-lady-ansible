@@ -10,3 +10,5 @@
                   - "5432:5432"
           env:
                   POSTGRES_PASSWORD: password
+          volumes:
+                  - "/home/pi/timescaledb:/var/lib/postgresql/data"
