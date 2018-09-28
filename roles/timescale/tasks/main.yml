@@ -1,0 +1,12 @@
+---
+# tasks file for timescale
+
+- name: Install TimescaleDB
+  docker_container:
+          name: timescaledb
+          image: timescale/timescaledb
+          pull: yes
+          exposed_ports:
+                  - "5432:5432"
+          env:
+                  POSTGRES_PASSWORD: password

@@ -5,6 +5,7 @@
   docker_container:
           name: rabbitmq
           image: mcostea/rabbitmq
+          pull: yes
           ports:
                   - "5672:5672"
                   - "5671:5671"

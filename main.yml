@@ -36,3 +36,9 @@
     openfaas_connector_mq_port: 5672
     openfaas_connector_faas_gw_url: "http://{{ hostvars['manager']['ansible_default_ipv4']['address'] }}:8080"
 
+- name: Install timescaledb
+  hosts: manager
+  remote_user: pi
+  roles:
+    - role: timescale
+
